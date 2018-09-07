@@ -1,4 +1,4 @@
-# Flight-System-G940-uinput-based-driver-linux  
+# Flight System G940 uinput based driver linux  
   
 A user space driver for Flihgt System G940, based on uinput (linux only)  
   
