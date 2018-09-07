@@ -2,8 +2,7 @@
 
 using namespace std;
 // one complete cache line
-uint32_t state_buf[16] __attribute__((aligned(64)))= {0,0,0,0,0,0,0,0,0,0,0,0};
-
+uint32_t state_buf[16] __attribute__((aligned(64))) = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int uinput_fd = 0;
 libusb_context *usb_ctx = NULL;
@@ -276,9 +275,7 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 		for (i=0; i<5; i++) {
 			state_diff[i] = state[i] ^ state_buf[i + 1];
 			state[i] = state_buf[i + 1];
-//			printf("%08x ",state_diff[i]);
 		}
-//		printf("\n");
 
 		gettimeofday(&event.time, 0);
 		
