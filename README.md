@@ -11,7 +11,7 @@ To use this driver:
   
 ensure 'libusb-1.0-dev' packet is installed on your system  
 clone this repo 'git clone '   
-cd g940  
+cd G940  
 make  
   
 There should be an driver 'g940' now.  
