@@ -1,6 +1,6 @@
-# Flight System G940 uinput based driver (linux)  
+# Flight System G940 - uinput based driver (linux)  
   
-A user space driver for Flight System G940, based on uinput (linux only)  
+User space driver for Flight System G940, based on uinput  
   
 This is a very simple (but fast and solid) replacement for the G940 kernel driver.  
   
