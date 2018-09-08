@@ -11,7 +11,7 @@ libusb_device_handle *g940_handle;
 // lookup-table for BTN codes
 const uint16_t btn_code_lut[32] = {
 // all buttons, sensors and switches
-	BTN_TRIGGER,			// main trigger, first phase
+	BTN_TRIGGER,				// main trigger, first phase
 	BTN_THUMB,				// red 'fire'
 	BTN_TOP,				// S1
 	BTN_TOP2,				// S2
@@ -25,18 +25,18 @@ const uint16_t btn_code_lut[32] = {
 	BTN_BASE4,				// T2
 	BTN_BASE5,				// T3
 	BTN_BASE6,				// T4
-	BTN_TRIGGER_HAPPY1,		// P1
-	BTN_TRIGGER_HAPPY2,		// P2
-	BTN_TRIGGER_HAPPY3,		// P3
+	BTN_TRIGGER_HAPPY1,			// P1
+	BTN_TRIGGER_HAPPY2,			// P2
+	BTN_TRIGGER_HAPPY3,			// P3
 
-	BTN_TRIGGER_HAPPY4,		// P4
-	BTN_TRIGGER_HAPPY5,		// P5
-	BTN_TRIGGER_HAPPY6,		// P6
-	BTN_TRIGGER_HAPPY7,		// P7
-	BTN_TRIGGER_HAPPY8,		// P8
-	BTN_TRIGGER_HAPPY9,		// MODE Switch 1
-	BTN_TRIGGER_HAPPY10,	// MODE Switch 3
-	0,						// fix at logical 1
+	BTN_TRIGGER_HAPPY4,			// P4
+	BTN_TRIGGER_HAPPY5,			// P5
+	BTN_TRIGGER_HAPPY6,			// P6
+	BTN_TRIGGER_HAPPY7,			// P7
+	BTN_TRIGGER_HAPPY8,			// P8
+	BTN_TRIGGER_HAPPY9,			// MODE Switch 1
+	BTN_TRIGGER_HAPPY10,			// MODE Switch 3
+	0,					// fix at logical 1
 	
 	0,
 	0,
@@ -45,7 +45,7 @@ const uint16_t btn_code_lut[32] = {
 	0,
 	BTN_DEAD,				// optical sensor on main stick
 	0,
-	0						// external power supply connected, not mapped to event
+	0					// external power supply connected, not mapped to event
 };
 
 const uint8_t axes_code_lut[20] = {
@@ -172,7 +172,7 @@ int g940_create_uinput() {
 	uabs.absinfo.minimum = -512;
 	uabs.absinfo.maximum = 511;
 	uabs.absinfo.fuzz = 0;
-	uabs.absinfo.flat = 0;	
+	uabs.absinfo.flat = 0;
 	uabs.code = ABS_X;
 	ioctl(fd, UI_ABS_SETUP, &uabs);
 	uabs.code = ABS_Y;
@@ -224,7 +224,7 @@ int g940_create_uinput() {
 	for (int i = BTN_TRIGGER; i < BTN_GAMEPAD; i++)
 		ioctl(fd, UI_SET_KEYBIT, i);
 
-	//P1-P8 and 2 x Modeswitch 
+	//P1-P8 and 2 x Modeswitch
 	for (int i = BTN_TRIGGER_HAPPY1; i < BTN_TRIGGER_HAPPY11; i++)
 		ioctl(fd, UI_SET_KEYBIT, i);
 
@@ -259,15 +259,15 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 	struct input_event event;
 //	timespec ts, te;
 
-	if (libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | G940_ENDPOINT, 
-								(uint8_t*)state_buf + 3, G940_REPORT_SIZE, &size, G940_READ_TIMEOUT)) {
+	if (libusb_interrupt_transfer(handle, LIBUSB_ENDPOINT_IN | G940_ENDPOINT,
+		(uint8_t*)state_buf + 3, G940_REPORT_SIZE, &size, G940_READ_TIMEOUT)) {
 
 		printf("libusb_interrupt_transfer failed");
 		return 1;
 
 	} else {
 //		clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
-		
+
 		if (size != G940_REPORT_SIZE) {
 			printf("unexpected report size : %d\n", size);
 			return 1;
@@ -278,7 +278,7 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 		}
 
 		gettimeofday(&event.time, 0);
-		
+
 		event.type = EV_ABS;
 		// process 32bit wise, then refine, for performance
 		// main axes X, Y
@@ -303,10 +303,10 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 					if (*state_diff & mask) {
 						uint8_t index = (*state & mask) >> (i * 4 + 20);
 						event.code = axes_code_lut[i * 2 + 2];
-						event.value = hat_lut[index].x; 
+						event.value = hat_lut[index].x;
 						write(ui_fd, &event, sizeof(event));
 						event.code = axes_code_lut[i * 2 + 3];
-						event.value = hat_lut[index].y; 
+						event.value = hat_lut[index].y;
 						write(ui_fd, &event, sizeof(event));
 					}
 					mask = mask << 4;
@@ -320,7 +320,7 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 		for (i=0; i<3; i++) {
 			state_diff++; state++;
 			if (*state_diff) {
-				mask = 0xff; 
+				mask = 0xff;
 				for (j=0; j<4; j++) {
 					if (*state_diff & mask) {
 						event.code = axes_code_lut[i * 4 + j + 8];
@@ -345,7 +345,7 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 						write(ui_fd, &event, sizeof(event));
 					}
 				}
-				mask = mask << 1; 
+				mask = mask << 1;
 			}
 		}
 
@@ -356,7 +356,7 @@ int g940_process_report(libusb_device_handle *handle, int ui_fd) {
 //	clock_gettime(CLOCK_MONOTONIC_RAW, &te);
 //	double dur = ((double)te.tv_nsec - (double)ts.tv_nsec) / 1000;
 //	printf("us: %f\n",dur);
-	
+
 	return 0;
 }
 
@@ -400,6 +400,6 @@ int main(int argc, char** argv) {
 	} while (running);
 
 	cleanup();
-	
+
 	return EXIT_SUCCESS;
 }
