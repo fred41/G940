@@ -2,7 +2,7 @@
 
 using namespace std;
 // one complete cache line
-uint32_t state_buf[16] __attribute__((aligned(64))) = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+uint32_t state_buf[16] __attribute__((aligned(64)))= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 int uinput_fd = 0;
 libusb_context *usb_ctx = NULL;
@@ -11,41 +11,41 @@ libusb_device_handle *g940_handle;
 // lookup-table for BTN codes
 const uint16_t btn_code_lut[32] = {
 // all buttons, sensors and switches
-	BTN_TRIGGER,		// main trigger, first phase
-	BTN_THUMB, 			// red 'fire'
-	BTN_TOP,			// S1
-	BTN_TOP2,			// S2
-	BTN_THUMB2,			// S3
-	BTN_BASE,			// S4
-	BTN_BASE2,			// S5
+	BTN_TRIGGER,			// main trigger, first phase
+	BTN_THUMB,				// red 'fire'
+	BTN_TOP,				// S1
+	BTN_TOP2,				// S2
+	BTN_THUMB2,				// S3
+	BTN_BASE,				// S4
+	BTN_BASE2,				// S5
 	0,
 
-	BTN_PINKIE,			// main trigger, second phase
-	BTN_BASE3,			// T1
-	BTN_BASE4,			// T2
-	BTN_BASE5,			// T3
-	BTN_BASE6,			// T4
-	BTN_TRIGGER_HAPPY1,	// P1
-	BTN_TRIGGER_HAPPY2,	// P2
-	BTN_TRIGGER_HAPPY3,	// P3
+	BTN_PINKIE,				// main trigger, second phase
+	BTN_BASE3,				// T1
+	BTN_BASE4,				// T2
+	BTN_BASE5,				// T3
+	BTN_BASE6,				// T4
+	BTN_TRIGGER_HAPPY1,		// P1
+	BTN_TRIGGER_HAPPY2,		// P2
+	BTN_TRIGGER_HAPPY3,		// P3
 
-	BTN_TRIGGER_HAPPY4,	// P4
-	BTN_TRIGGER_HAPPY5,	// P5
-	BTN_TRIGGER_HAPPY6,	// P6
-	BTN_TRIGGER_HAPPY7,	// P7
-	BTN_TRIGGER_HAPPY8,	// P8
-	BTN_TRIGGER_HAPPY9,	// MODE Switch 1
-	BTN_TRIGGER_HAPPY10,// MODE Switch 3
-	0,					// fix at logical 1
+	BTN_TRIGGER_HAPPY4,		// P4
+	BTN_TRIGGER_HAPPY5,		// P5
+	BTN_TRIGGER_HAPPY6,		// P6
+	BTN_TRIGGER_HAPPY7,		// P7
+	BTN_TRIGGER_HAPPY8,		// P8
+	BTN_TRIGGER_HAPPY9,		// MODE Switch 1
+	BTN_TRIGGER_HAPPY10,	// MODE Switch 3
+	0,						// fix at logical 1
 	
 	0,
 	0,
 	0,
 	0,
 	0,
-	BTN_DEAD,			// optical sensor on main stick
+	BTN_DEAD,				// optical sensor on main stick
 	0,
-	0					// external power supply connected, not mapped to event
+	0						// external power supply connected, not mapped to event
 };
 
 const uint8_t axes_code_lut[20] = {
