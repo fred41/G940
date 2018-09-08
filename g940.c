@@ -162,7 +162,7 @@ int g940_create_uinput() {
 	ioctl(fd, UI_SET_EVBIT, EV_ABS);
 
 	memset(&uinp, 0, sizeof(uinp));
-	strcpy(uinp.name, "G940");
+	strcpy(uinp.name, "Flight System G940");
 	uinp.id.version = 1;
 	uinp.id.bustype = BUS_USB;
 	uinp.id.product = G940_PRODUCT_ID;
