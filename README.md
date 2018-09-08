@@ -22,7 +22,7 @@ You have to add (most likely) two udev rules, to give the driver write access
 to the uinput system and read access to G940 USB device from user space:  
   
 KERNEL=="uinput", SYMLINK+="input/uinput", GROUP="input"   
-SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c287", MODE="0666"  
+SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c287", MODE="0660"  
   
 Add your user to group 'input' if not not already added. Activate the new rules by a restart.  
   

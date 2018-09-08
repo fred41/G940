@@ -1,2 +1,2 @@
 KERNEL=="uinput", SYMLINK+="input/uinput", GROUP="input"
-SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c287", MODE="0666"
+SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c287", MODE="0660"
