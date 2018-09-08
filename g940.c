@@ -150,13 +150,13 @@ int g940_create_uinput() {
 		access("/dev/uinput", W_OK) == 0 ? "/dev/uinput" : 0;
 	if (!dev_ui_fn) {
 		printf("No writable uinput device found\n");
-		return -1;
+		return 0;
 	}
 
 	int fd = open(dev_ui_fn, O_WRONLY | O_NONBLOCK);
 	if (fd <= 0) {
 		printf("Opening uinput device failed: %d\n", fd);
-		return -1;
+		return 0;
 	}
 
 	ioctl(fd, UI_SET_EVBIT, EV_ABS);

@@ -18,12 +18,13 @@ make**
   
 There should be a file 'g940' now (the driver executable).  
   
-You have to add (most likely) a new udev rule, to give the driver access  
-to the G940 USB device from user space:  
+You have to add (most likely) two udev rules, to give the driver write access  
+to the uinput system and read access to G940 USB device from user space:  
   
+KERNEL=="uinput", SYMLINK+="input/uinput", GROUP="input"   
 SUBSYSTEM=="usb", ATTR{idVendor}=="046d", ATTR{idProduct}=="c287", MODE="0666"  
   
-Activate the new rule by a restart.  
+Add your user to group 'input' if not not already added. Activate the new rules by a restart.  
   
 Plug in your G940, run the driver from terminal (./g940) and use 'evtest' or your game   
 to test functionality.  
