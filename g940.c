@@ -5,12 +5,12 @@ using namespace std;
 // lookup-table for BTN codes
 const uint16_t btn_code_lut[32] = {
 // all buttons, sensors and switches
-	BTN_TRIGGER,				// main trigger, first phase
+	BTN_TRIGGER,			// main trigger, first phase
 	BTN_THUMB,				// red 'fire'
-	BTN_TOP,				// S1
-	BTN_TOP2,				// S2
+	BTN_TOP,					// S1
+	BTN_TOP2,					// S2
 	BTN_THUMB2,				// S3
-	BTN_BASE,				// S4
+	BTN_BASE,					// S4
 	BTN_BASE2,				// S5
 	0,
 
@@ -29,9 +29,9 @@ const uint16_t btn_code_lut[32] = {
 	BTN_TRIGGER_HAPPY7,			// P7
 	BTN_TRIGGER_HAPPY8,			// P8
 	BTN_TRIGGER_HAPPY9,			// MODE Switch 1
-	BTN_TRIGGER_HAPPY10,			// MODE Switch 3
-	0,					// fix at logical 1
-	
+	BTN_TRIGGER_HAPPY10,		// MODE Switch 3
+	0,											// fix at logical 1
+
 	0,
 	0,
 	0,
@@ -97,7 +97,8 @@ libusb_context *usb_ctx = NULL;
 int uinput_fd = 0;
 
 
-void g940_find_usb_dev(libusb_device **devs, size_t cnt, libusb_device **g940_dev, libusb_device_handle **g940_handle) {
+void g940_find_usb_dev(libusb_device **devs, size_t cnt, libusb_device **g940_dev, libusb_device_handle **g940_handle)
+{
 
 	libusb_device_descriptor desc;
 	libusb_device *dev = NULL;
@@ -143,11 +144,47 @@ void g940_find_usb_dev(libusb_device **devs, size_t cnt, libusb_device **g940_de
 	}
 }
 
-int g940_create_uinput() {
+void g940_init_device()
+{
+	uint8_t ff_buf[68] = {0};
+	ff_t *ff = (ff_t*)&ff_buf[4];
+	ff_axis_t *ff_axis;
+	int size;
+
+	// report ID
+	ff_buf[3] = 2;
+
+	// set usable conditions for horizontal ff axis
+	ff_axis = &ff->x;
+	ff_axis->spring_deadzone_neg = 0;
+	ff_axis->spring_deadzone_pos = 0;
+	ff_axis->spring_coeff_neg = 0x1f;
+	ff_axis->spring_coeff_pos = 0x1f;
+	ff_axis->spring_saturation = 0x1fff;
+	ff_axis->damper_coeff_neg = 0x1f;
+	ff_axis->damper_coeff_pos = 0x1f;
+	ff_axis->damper_saturation = 0x1fff;
+
+	// do the same for vertical axis
+	memcpy(&ff->y, &ff->x, sizeof(ff_axis_t));
+
+	if (libusb_interrupt_transfer(g940_handle, LIBUSB_ENDPOINT_OUT | G940_ENDPOINT,
+	                              &ff_buf[3], G940_FF_REPORT_SIZE, &size, G940_READ_TIMEOUT)) {
+
+		printf("libusb_interrupt_transfer failed");
+	} else {
+
+		if (size != G940_FF_REPORT_SIZE)
+			printf("unexpected transfer size : %d\n", size);
+	}
+}
+
+int g940_create_uinput()
+{
 	struct uinput_setup uinp;
 	struct uinput_abs_setup uabs;
 	const char* dev_ui_fn =
-		access("/dev/uinput", W_OK) == 0 ? "/dev/uinput" : 0;
+	  access("/dev/uinput", W_OK) == 0 ? "/dev/uinput" : 0;
 	if (!dev_ui_fn) {
 		printf("No writable uinput device found\n");
 		return 0;
@@ -239,7 +276,9 @@ int g940_create_uinput() {
 	return fd;
 }
 
-void cleanup() {
+
+void cleanup()
+{
 	ioctl(uinput_fd, UI_DEV_DESTROY);
 	close(uinput_fd);
 	libusb_release_interface(g940_handle, G940_INTERFACE);
@@ -247,17 +286,19 @@ void cleanup() {
 	libusb_exit(usb_ctx);
 }
 
-void sig_cb_handler(int signum) {
+void sig_cb_handler(int signum)
+{
 	cleanup();
 	exit(signum);
 }
 
-void g940_process_report(int ui_fd, uint32_t* state_buf) {
+void g940_process_report(int ui_fd, uint32_t* state_buf)
+{
 	uint32_t *state_diff = &state_buf[6], *state = &state_buf[11];
 	uint32_t mask;
-	int i , j;
+	int i, j;
 	struct input_event event;
-//	timespec ts, te;
+//	struct timespec ts, te;
 
 //	clock_gettime(CLOCK_MONOTONIC_RAW, &ts);
 
@@ -307,7 +348,8 @@ void g940_process_report(int ui_fd, uint32_t* state_buf) {
 	// BRAKE LEFT, TRIM 3&2&1
 	// R1, R2 , MINI_X, MINI_Y
 	for (i=0; i<3; i++) {
-		state_diff++; state++;
+		state_diff++;
+		state++;
 		if (*state_diff) {
 			mask = 0xff;
 			for (j=0; j<4; j++) {
@@ -338,7 +380,9 @@ void g940_process_report(int ui_fd, uint32_t* state_buf) {
 		}
 	}
 
-	event.type = EV_SYN; event.code = SYN_REPORT; event.value = 0;
+	event.type = EV_SYN;
+	event.code = SYN_REPORT;
+	event.value = 0;
 	write(ui_fd, &event, sizeof(event));
 
 //	clock_gettime(CLOCK_MONOTONIC_RAW, &te);
@@ -347,10 +391,11 @@ void g940_process_report(int ui_fd, uint32_t* state_buf) {
 
 }
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
 
 	// one complete cache line
-	static uint32_t state_buf[16] __attribute__((aligned(64)))= {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	static uint32_t state_buf[16] __attribute__((aligned(64)))= {0};
 	libusb_device **devs = NULL;
 	libusb_device *g940_dev = NULL;
 
@@ -379,6 +424,8 @@ int main(int argc, char** argv) {
 		return 1;
 	}
 
+	g940_init_device();
+
 	uinput_fd = g940_create_uinput();
 	if (!uinput_fd)
 		return 1;
@@ -387,19 +434,19 @@ int main(int argc, char** argv) {
 
 	do {
 		if (libusb_interrupt_transfer(g940_handle, LIBUSB_ENDPOINT_IN | G940_ENDPOINT,
-			(uint8_t*)state_buf + 3, G940_REPORT_SIZE, &size, G940_READ_TIMEOUT)) {
+		                              (uint8_t*)state_buf + 3, G940_REPORT_SIZE, &size, G940_READ_TIMEOUT)) {
 
 			printf("libusb_interrupt_transfer failed");
 			running = false;
-		} else {	
+		} else {
 
 			if (size != G940_REPORT_SIZE)
 				printf("unexpected report size : %d\n", size);
 
-			else 
+			else
 				g940_process_report(uinput_fd, state_buf);
 		}
-		
+
 	} while (running);
 
 	cleanup();
